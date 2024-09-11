@@ -43,8 +43,7 @@ To run this project locally, follow these steps:
 
  **Technologies Used** 🧑‍💻
 - **Frontend**: React, Material UI
-- **Backend**: Node.js, Express
-- **Database**: MongoDB, MySQL
+- **Database**: Firebase
 - **Version Control**: Git, GitHub
 
  **Project Structure** 📂
