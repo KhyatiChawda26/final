@@ -27,7 +27,7 @@ To run this project locally, follow these steps:
   **2. Install dependencies**
     npm install
 
-    **3. Create .env file and setup the firebase configuration as below**
+   **3. Create .env file and setup the firebase configuration as below**
     You need to go to firebase official site and get the below things from the project settings
       **VITE_API_KEY**= Your API Key
       **VITE_AUTH_DOMAIN**= Your Authentication Domain
