@@ -33,7 +33,7 @@ const CertificationDialog = ({
       <DialogContent dividers>
         <TextField
           label="Certification Name"
-          value={currentCertification.name}
+          value={currentCertification?.name}
           onChange={(e) =>
             setCurrentCertification({
               ...currentCertification,
@@ -45,7 +45,7 @@ const CertificationDialog = ({
         />
         <TextField
           label="Issuer"
-          value={currentCertification.issuer}
+          value={currentCertification?.issuer}
           onChange={(e) =>
             setCurrentCertification({
               ...currentCertification,
@@ -58,7 +58,7 @@ const CertificationDialog = ({
         <TextField
           label="Issue Date"
           type="date"
-          value={currentCertification.issueDate}
+          value={currentCertification?.issueDate}
           onChange={(e) =>
             setCurrentCertification({
               ...currentCertification,

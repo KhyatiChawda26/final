@@ -20,7 +20,14 @@ import { Edit } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
 import EduExpDialog from "./Dialogs/EduExpDialog";
 import { db, auth } from "../Database/firebaseConfig";
-import { doc, getDoc, updateDoc, deleteField, arrayUnion, arrayRemove } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  deleteField,
+  arrayUnion,
+  arrayRemove,
+} from "firebase/firestore";
 import { toast } from "react-hot-toast";
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -31,7 +38,7 @@ const Education = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // Adjust as needed
+  const itemsPerPage = 3; // Adjust as needed
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -67,8 +74,11 @@ const Education = () => {
   };
 
   const totalPages = Math.ceil(education.length / itemsPerPage);
+  console.log("totalpages of education: ", totalPages);
   const startIndex = (currentPage - 1) * itemsPerPage;
+  console.log("startIndex of education: ", startIndex);
   const itemsToShow = education.slice(startIndex, startIndex + itemsPerPage);
+  console.log("itemstoshow of education: ", itemsToShow);
 
   const handleOpenDialog = (index = null) => {
     setEditIndex(index);
@@ -90,7 +100,7 @@ const Education = () => {
           setEducation(updatedEducation);
 
           await updateDoc(userRef, {
-            education: updatedEducation
+            education: updatedEducation,
           });
         } else {
           const newEducation = { ...newData, id: Date.now().toString() };
@@ -102,7 +112,7 @@ const Education = () => {
           });
 
           await updateDoc(userRef, {
-            education: arrayUnion(newEducation)
+            education: arrayUnion(newEducation),
           });
         }
         handleCloseDialog();
@@ -123,7 +133,7 @@ const Education = () => {
 
         const userRef = doc(db, "users", user.uid);
         await updateDoc(userRef, {
-          education: arrayRemove(education.find((edu) => edu.id === id))
+          education: arrayRemove(education.find((edu) => edu.id === id)),
         });
       } catch (error) {
         console.error("Error deleting education data: ", error);

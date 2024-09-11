@@ -7,8 +7,9 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
-import { db } from "../Database/firebaseConfig"; // Import Firestore
+import { db, storage } from "../Database/firebaseConfig"; // Import Firestore and Firebase Storage
 import { doc, setDoc, getDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Firebase storage functions
 import { toast } from "react-hot-toast"; // Use for notifications
 
 const SideBar = ({
@@ -23,16 +24,7 @@ const SideBar = ({
   const [profileImage, setProfileImage] = useState(
     "https://via.placeholder.com/150"
   );
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setProfileImage(e.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  const [selectedFile, setSelectedFile] = useState(null);
 
   // Fetch user profile from Firestore
   useEffect(() => {
@@ -41,7 +33,19 @@ const SideBar = ({
         const userRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userRef);
         if (userDoc.exists()) {
-          setProfile(userDoc.data());
+          const userData = userDoc.data();
+          setProfile(userData);
+
+          // Check if user has a profile image
+          if (userData.profileImage) {
+            setProfileImage(userData.profileImage);
+          } else {
+            // Set default image with user's initials
+            const initials =
+              (userData.firstName ? userData.firstName[0] : "") +
+              (userData.lastName ? userData.lastName[0] : "");
+            setProfileImage(`https://ui-avatars.com/api/?name=${initials}`);
+          }
         } else {
           console.log("No such document!");
         }
@@ -51,16 +55,62 @@ const SideBar = ({
     fetchProfile();
   }, [user, setProfile]);
 
-  // Update or create user profile in Firestore
+  // Handle image file selection
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate the file type (image only) and size (limit to 2MB)
+      const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+      if (!validTypes.includes(file.type)) {
+        toast.error("Only image files (JPEG, PNG) are allowed.");
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error("File size should be less than 2MB.");
+        return;
+      }
+
+      setSelectedFile(file);
+
+      // Preview the selected image before uploading
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setProfileImage(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Handle saving/updating the profile along with the profile image
   const handleSaveProfile = async () => {
     if (!user || !user.uid) {
       toast.error("User not authenticated.");
       return;
     }
 
+    let profileImageUrl = profileImage;
+
+    // If a new image was selected, upload it to Firebase Storage
+    if (selectedFile) {
+      try {
+        const storageRef = ref(storage, `profileImages/${user.uid}`);
+        const snapshot = await uploadBytes(storageRef, selectedFile);
+        profileImageUrl = await getDownloadURL(snapshot.ref);
+      } catch (error) {
+        console.error("Error uploading profile image: ", error);
+        toast.error("Failed to upload profile image.");
+        return;
+      }
+    }
+
+    // Save the profile with the image URL to Firestore
     try {
       const userRef = doc(db, "users", user.uid);
-      await setDoc(userRef, { ...profile, uid: user.uid }, { merge: true });
+      await setDoc(
+        userRef,
+        { ...profile, uid: user.uid, profileImage: profileImageUrl },
+        { merge: true }
+      );
       toast.success("Profile updated successfully!");
       handleEditToggle(); // Exit edit mode after saving
     } catch (error) {
@@ -84,10 +134,12 @@ const SideBar = ({
           alt="User Avatar"
           sx={{ width: 150, height: 150, margin: "0 auto" }}
         />
-        <Button variant="outlined" component="label" sx={{ marginTop: 2 }}>
-          Change Profile Image
-          <input type="file" hidden onChange={handleImageUpload} />
-        </Button>
+        {editMode && (
+          <Button variant="outlined" component="label" sx={{ marginTop: 2 }}>
+            Change Profile Image
+            <input type="file" hidden onChange={handleImageUpload} />
+          </Button>
+        )}
         {editMode ? (
           <>
             <TextField
