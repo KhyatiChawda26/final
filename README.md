@@ -29,13 +29,13 @@ To run this project locally, follow these steps:
 
    **3. Create .env file and setup the firebase configuration as below**
     You need to go to firebase official site and get the below things from the project settings
-      - **VITE_API_KEY**= Your API Key
-      - **VITE_AUTH_DOMAIN**= Your Authentication Domain
-      - **VITE_PROJECT_ID**= Your Project ID
-      - **VITE_STORAGE_BUCKET**= Create a new storage in the project and paste the link/id here
-      - **VITE_MESSAGING_SENDER_ID**= Your Unique ID 
-      - **VITE_APP_ID**= Your Unique App ID
-      - **VITE_MEASUREMENT_ID**= Your Mesaurement ID
+    - **VITE_API_KEY**= Your API Key
+    - **VITE_AUTH_DOMAIN**= Your Authentication Domain
+    - **VITE_PROJECT_ID**= Your Project ID
+    - **VITE_STORAGE_BUCKET**= Create a new storage in the project and paste the link/id here
+    - **VITE_MESSAGING_SENDER_ID**= Your Unique ID 
+    - **VITE_APP_ID**= Your Unique App ID
+    - **VITE_MEASUREMENT_ID**= Your Mesaurement ID
    
   **3. Run the project**
     npm start
